@@ -1,0 +1,9 @@
+{
+  "name": "rust_loader",
+  "version": "1.0.0",
+  "description": "Webpack loader for Rust",
+  "main": "src/index.js",
+  "repository": "https://github.com/Ralvke/rust_loader",
+  "author": "Maxim lis <ralvke@gmail.com>",
+  "license": "MIT"
+}
