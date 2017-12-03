@@ -7,15 +7,19 @@
   "author": "Maxim lis <ralvke@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "watch": "babel src/index.js --out-file lib.js --watch",
-    "build": "babel src/index.js --out-file lib.js",
+    "watch": "node_modules/.bin/babel src/index.js --out-file lib.js --watch",
+    "build": "node_modules/.bin/babel src/index.js --out-file lib.js",
+    "lint": "node_modules/.bin/eslint src",
+    "precommit": "yarn lint",
     "prepublish": "yarn build"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.34",
     "@babel/core": "^7.0.0-beta.34",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.34",
-    "@babel/preset-env": "^7.0.0-beta.34"
-  },
-  "dependencies": {}
+    "@babel/preset-env": "^7.0.0-beta.34",
+    "@octetstream/eslint-config": "2.1.0",
+    "eslint": "4.12.1",
+    "husky": "0.14.3"
+  }
 }
