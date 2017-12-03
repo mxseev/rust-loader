@@ -1,12 +1,11 @@
-import child_process from "child_process"
-import os from "os"
-import fs from "fs"
-import path from "path"
-
+import {readdirSync, createReadStream, createWriteStream} from "fs"
+import {dirname, basename, extname, join, parse} from "path"
+import {spawn} from "child_process"
+import {tmpdir} from "os"
 
 // rustc wrapper
 const rustc = (input, output) => new Promise((resolve, reject) => {
-  const process = child_process.spawn("rustc", [
+  const child = spawn("rustc", [
     "+nightly",
     "--target=wasm32-unknown-unknown",
     "--crate-type=cdylib",
@@ -16,7 +15,7 @@ const rustc = (input, output) => new Promise((resolve, reject) => {
     output
   ])
 
-  process.on("close", code => {
+  child.on("close", code => {
     if (code !== 0) {
       reject(new Error(`rustc ended with non-zero code: ${code}`))
     } else {
@@ -27,7 +26,7 @@ const rustc = (input, output) => new Promise((resolve, reject) => {
 
 // cargo wrapper
 const cargo = (input, output) => new Promise((resolve, reject) => {
-  const process = child_process.spawn("cargo", [
+  const child = spawn("cargo", [
     "+nightly",
     "build",
     "--target=wasm32-unknown-unknown",
@@ -35,18 +34,27 @@ const cargo = (input, output) => new Promise((resolve, reject) => {
     `--manifest-path=${input}`
   ])
 
-  process.on("close", code => {
+  child.on("close", code => {
     if (code !== 0) {
-      reject(new Error(`cargo ended with non-zero code: ${code}`))
+      reject(new Error(`Cargo ended with non-zero code: ${code}`))
     } else {
-      const buildPath = path.join(path.dirname(input), "target/wasm32-unknown-unknown/release/")
-      const buildFiles = fs.readdirSync(buildPath)
-      const wasmFiles = buildFiles.filter(filename => path.extname(filename) === ".wasm")
+      const buildPath = join(
+        dirname(input), "target/wasm32-unknown-unknown/release/"
+      )
+
+      // TODO: Replace this method with async version
+      const buildFiles = readdirSync(buildPath)
+
+      const wasmFiles = buildFiles
+        .filter(filename => extname(filename) === ".wasm")
+
       if (wasmFiles.length === 0) {
         reject(new Error(`no one wasm file in cargo build dir: ${buildPath}`))
       } else {
-        const wasmFile = path.join(buildPath, wasmFiles[0])
-        fs.createReadStream(wasmFile).pipe(fs.createWriteStream(output)).on("finish", resolve)
+        const wasmFile = join(buildPath, wasmFiles[0])
+        createReadStream(wasmFile)
+          .pipe(createWriteStream(output))
+          .on("finish", resolve)
       }
     }
   })
@@ -54,9 +62,9 @@ const cargo = (input, output) => new Promise((resolve, reject) => {
 
 // wasm-gc wrapper
 const wasmGc = filename => new Promise((resolve, reject) => {
-  const process = child_process.spawn("wasm-gc", [filename, filename])
+  const child = spawn("wasm-gc", [filename, filename])
 
-  process.on("close", code => {
+  child.on("close", code => {
     if (code !== 0) {
       reject(new Error(`wasm-gc ended with non-zero code: ${code}`))
     } else {
@@ -74,17 +82,19 @@ const glue = file => (`
   })()
 `)
 
-const rustLoader = async function(content) {
-  const webpackCb = this.async()
+const rustLoader = async function() {
+  const cb = this.async()
+
   const input = this.resourcePath
-  let {name, ext} = path.parse(input)
+  const {name, ext} = parse(input)
 
   let output
   if (ext === ".rs") {
-    output = path.join(os.tmpdir(), name)
+    output = join(tmpdir(), name)
   } else {
-    output = path.join(os.tmpdir(), path.basename(path.dirname(input)))
+    output = join(tmpdir(), basename(dirname(input)))
   }
+
   output = `${output}.wasm`
 
   try {
@@ -92,14 +102,16 @@ const rustLoader = async function(content) {
       await rustc(input, output)
     } else if (ext === ".toml") {
       await cargo(input, output)
-      this.addContextDependency(path.join(input, "../src"))
+      this.addContextDependency(join(input, "../src"))
     } else {
       throw new Error(`File type "${ext}" not supported`)
     }
+
     await wasmGc(output)
-    webpackCb(null, glue(output))
-  } catch (e) {
-    webpackCb(e)
+
+    cb(null, glue(output))
+  } catch (err) {
+    cb(err)
   }
 }
 
