@@ -76,9 +76,7 @@ const wasmGc = filename => new Promise((resolve, reject) => {
 const glue = file => (`
   module.exports = (() => {
     const wasm = require("${file}")
-    return fetch(wasm)
-      .then(r => r.arrayBuffer())
-      .then(bytes => WebAssembly.instantiate(bytes))
+    return fetch(wasm).then(r => r.arrayBuffer())
   })()
 `)
 

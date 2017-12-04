@@ -29,13 +29,14 @@ pub fn plus_one(x: i32) -> i32 {
 import add from "./add.rs"
 import hugeCrate from "./huge_crate/Cargo.toml"
 
-add.then(wasm => {
-  console.log(wasm.instance.exports.add(1, 2)) // 3
-})
-hugeCrate.then(wasm => {
-  console.log(wasm.instance.exports.plus_one(6)) // 7
-  console.log(wasm.instance.exports.plus_one(42)) // 420
-})
+(async () => {
+  const add = await add.then(buf => WebAssembly.instantiate(buf))
+  const hugeCrate = await hugeCrate.then(buf => WebAssembly.instantiate(buf))
+
+  console.log(add.instance.exports.add(1, 2)) // 3
+  console.log(hugeCrate.instance.exports.plus_one(6)) // 7
+  console.log(hugeCrate.instance.exports.plus_one(42)) // 420
+})()
 ```
 
 ## Features
