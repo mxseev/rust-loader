@@ -24,7 +24,7 @@ pub fn plus_one(x: i32) -> i32 {
     if its_magic_number(x) { 420 } else { x + 1 }
 }
 ```
-### main.js
+#### main.js
 ```js
 import add from "./add.rs"
 import hugeCrate from "./huge_crate/Cargo.toml"
