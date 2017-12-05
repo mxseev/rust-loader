@@ -43,7 +43,7 @@ const rustc = ({name, filename}) => new Promise((resolve, reject) => {
     filename,
     "-o",
     dest
-  ]).tnen(onFulfilled, reject)
+  ]).then(onFulfilled, reject)
 })
 
 const cargo = ({filename}, ctx) => new Promise((resolve, reject) => {
