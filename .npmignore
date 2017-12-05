@@ -4,5 +4,4 @@ node_modules
 .gitignore
 .eslintrc.json
 
-src
 yarn.lock
