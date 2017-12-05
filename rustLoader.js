@@ -96,7 +96,7 @@ function rustLoader() {
 
   const path = assign({}, parse(filename), {filename})
 
-  const compiler = compilers[path.ext.slice(0, -1)]
+  const compiler = compilers[path.ext.slice(1)]
 
   if (typeof compiler !== "function") {
     return cb(new Error(`Unsupported file extension: ${path.ext}`))
