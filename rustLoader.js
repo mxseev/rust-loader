@@ -92,7 +92,7 @@ const compilers = {
 function rustLoader() {
   const cb = this.async()
 
-  const filename = this.resourcePath()
+  const filename = this.resourcePath
 
   const path = assign({}, parse(filename), {filename})
 
