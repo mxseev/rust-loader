@@ -2,8 +2,9 @@ const {readdir, createReadStream, createWriteStream} = require("fs")
 const {basename, extname, dirname, join, parse} = require("path")
 const {tmpdir} = require("os")
 
+const promisify = require("@octetstream/promisify")
+
 const spawn = require("./spawn")
-const promisify = require("./promisify")
 
 const assign = Object.assign
 
