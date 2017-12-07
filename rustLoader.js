@@ -11,16 +11,12 @@ const copy = (src, dest) => new Promise((resolve, reject) => {
   createReadStream(src)
     .pipe(createWriteStream(dest))
     .on("error", reject)
-    .on("end", resolve)
+    .on("finish", resolve)
 })
 
 const rd = promisify(readdir)
 
-function wasmGC(filename) {
-  filename = `${filename}.wasm`
-
-  return spawn("wasm-gc", [filename, filename])
-}
+const wasmGC = filename => spawn("wasm-gc", [filename, filename])
 
 const wrap = filename => (`
   module.exports = (() => {
@@ -31,7 +27,7 @@ const wrap = filename => (`
 `)
 
 const rustc = ({name, filename}) => new Promise((resolve, reject) => {
-  const dest = join(tmpdir(), name)
+  const dest = `${join(tmpdir(), name)}.wasm`
 
   const onFulfilled = () => resolve(dest)
 
@@ -47,13 +43,15 @@ const rustc = ({name, filename}) => new Promise((resolve, reject) => {
 })
 
 const cargo = ({filename}, ctx) => new Promise((resolve, reject) => {
-  const dest = join(tmpdir(), basename(dirname(filename)))
+  const dest = `${join(tmpdir(), basename(dirname(filename)))}.wasm`
 
   const buildPath = join(
     dirname(filename), "target/wasm32-unknown-unknown/release"
   )
 
-  function onBuild(files) {
+  const onCompilled = () => rd(buildPath)
+
+  function onDir(files) {
     files = files.filter(file => extname(file) === ".wasm")
 
     if (files.length === 0) {
@@ -78,8 +76,8 @@ const cargo = ({filename}, ctx) => new Promise((resolve, reject) => {
     "--target=wasm32-unknown-unknown",
     "--release"
   ])
-    .then(rd(buildPath))
-    .then(onBuild)
+    .then(onCompilled)
+    .then(onDir)
     .then(onFulfilled)
     .catch(reject)
 })
