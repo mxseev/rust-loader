@@ -17,7 +17,10 @@ const copy = (src, dest) => new Promise((resolve, reject) => {
 
 const rd = promisify(readdir)
 
-const wasmGC = filename => spawn("wasm-gc", [filename, filename])
+const wasmGC = filename => new Promise((resolve, reject) => {
+  const onFulfilled = () => resolve(filename)
+  spawn("wasm-gc", [filename, filename]).then(onFulfilled, reject)
+})
 
 const wrap = filename => (`
   module.exports = (() => {
