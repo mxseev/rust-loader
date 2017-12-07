@@ -1,2 +1,3 @@
 node_modules
 .DS_Store
+test/rust/add_crate/target

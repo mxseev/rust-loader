@@ -1,0 +1,7 @@
+[package]
+name = "add_crate"
+version = "0.1.0"
+authors = ["Maxim lis <ralvke@gmail.com>"]
+
+[lib]
+crate-type = ["cdylib"]
