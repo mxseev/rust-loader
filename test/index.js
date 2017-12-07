@@ -5,7 +5,6 @@ import build from "./_build.js"
 
 
 const outDir = join(tmpdir(), "rust-loader-test")
-
 const globalConfig = {
   output: {path: outDir},
   module: {
