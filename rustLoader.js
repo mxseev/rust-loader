@@ -50,7 +50,7 @@ const cargo = ({filename}, ctx) => new Promise((resolve, reject) => {
     dirname(filename), "target/wasm32-unknown-unknown/release"
   )
 
-  const onCompilled = () => rd(buildPath)
+  const onCompiled = () => rd(buildPath)
 
   function onDir(files) {
     files = files.filter(file => extname(file) === ".wasm")
@@ -77,7 +77,7 @@ const cargo = ({filename}, ctx) => new Promise((resolve, reject) => {
     "--target=wasm32-unknown-unknown",
     "--release"
   ])
-    .then(onCompilled)
+    .then(onCompiled)
     .then(onDir)
     .then(onFulfilled)
     .catch(reject)
