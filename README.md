@@ -1,3 +1,6 @@
+# The project is in low maintance now
+Use [WasmPack](https://rustwasm.github.io/docs/wasm-pack/tutorials/hybrid-applications-with-webpack/index.html) instead
+
 # Webpack Rust loader
 Webpack loader for Rust
 
