@@ -16,7 +16,8 @@ const globalConfig = {
       {
         test: /\.wasm$/,
         loader: "file-loader",
-        options: {name: "[name].[ext]"}
+        options: {name: "[name].[ext]"},
+        type: "javascript/auto"
       }
     ]
   }

@@ -62,7 +62,8 @@ import hugeCrate from "./huge_crate/Cargo.toml"
       },
       {
         test: /\.wasm$/,
-        loader: "file-loader"
+        loader: "file-loader",
+        type: "javascript/auto"
       }
     ]
     ```
